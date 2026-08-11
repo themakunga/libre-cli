@@ -1,85 +1,95 @@
-# ⚡ FreeStyle Libre 2 CLI Monitor
+# ⚡ libre-cli
 
-![Go](https://img.shields.io/badge/Go-1.20+-00ADD8?style=for-the-badge&logo=go)
-![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Linux-lightgrey?style=for-the-badge)
-![UI](https://img.shields.io/badge/UI-Bubble%20Tea%20%7C%20Lipgloss-FF0055?style=for-the-badge)
-![Config](https://img.shields.io/badge/Config-TOML-8B4513?style=for-the-badge)
-![Status](https://img.shields.io/badge/Status-Active-brightgreen?style=for-the-badge)
+Un monitor interactivo en tiempo real para la terminal (TUI) para visualizar datos de glucosa de sensores **FreeStyle Libre** consumidos a través de la API no oficial de **LibreLinkUp**.
 
-[🇺🇸 English](#-english) | [🇪🇸 Español](#-español)
+![Licencia MIT](https://img.shields.io/badge/License-MIT-blue.svg)
+![Go Version](https://img.shields.io/badge/Go-1.20%2B-00ADD8.svg)
+![GitHub Release](https://img.shields.io/github/v/release/TU_USUARIO/libre-cli?color=brightgreen)
 
 ---
 
-## 🇺🇸 English
-
-### 📖 Overview
-A beautiful, highly customizable Terminal-based UI (TUI) to monitor your **FreeStyle Libre 2** glucose data. It fetches data (via LibreLinkUp simulation/API) and displays your current glucose levels, trend arrows, and an ASCII graph of the last few hours right in your terminal.
-
-Built with Golang, Bubble Tea, and Lipgloss.
-
-### ✨ Features
-*   **Real-time Monitoring:** Auto-updates every 5 minutes (configurable).
-*   **Terminal Graph:** Renders a clean line graph inside the CLI.
-*   **Dynamic Colors:** Highlights glucose numbers in green, yellow, or red depending on your target range.
-*   **TOML Configuration:** Easy setup and theming (comes with **Tokyo Night** by default).
-*   **Cross-Platform:** Works seamlessly on Linux and macOS.
-
-### 🚀 Installation
-
-You can install the application using standard `make` or via the provided bash script.
-
-**Option 1: Using Make (Recommended)**
-make install
-
-**Option 2: Using the Installation Script**
-./install.sh
-
-### ⚙️ Configuration
-On its first run, the app will automatically generate a configuration file located at:
-~/.config/libre-cli/config.toml
-
-You can edit this file to change your LibreLinkUp credentials, adjust the auto-update interval, define your target glucose range (min_glucose / max_glucose), and completely customize the theme colors.
-
-### 💻 Usage
-Simply run the command from any terminal:
-libre-cli
-
-Press q or Ctrl+C to safely exit the application.
+> ⚠️ **AVISO LEGAL Y DESCARGO DE RESPONSABILIDAD (DISCLAIMER)**
+>
+> 1. **Sin Afiliación Comercial:** Este proyecto **NO** está afiliado, asociado, autorizado, respaldado ni conectado de ninguna manera oficialmente con **Abbott Laboratories**, **FreeStyle Libre**, **LibreLinkUp**, ni con ninguna de sus filiales o subsidiarias. El nombre *FreeStyle Libre*, así como las marcas y logotipos relacionados, son marcas registradas de sus respectivos propietarios.
+> 2. **Uso Exclusivamente Personal y Educativo:** Esta herramienta ha sido desarrollada con fines exclusivamente educativos, de aprendizaje técnico y de **uso estrictamente personal**. No debe utilizarse en entornos de producción médica ni para la automatización de decisiones de salud.
+> 3. **No es un Dispositivo Médico:** **`libre-cli` NO es un dispositivo médico** ni un software de diagnóstico. No debes tomar decisiones médicas ni de dosificación (como administración de insulina) basándote en los datos visualizados en esta aplicación. Utiliza siempre las aplicaciones oficiales aprobadas por las autoridades de salud y los dispositivos de medición directa recomendados por tu médico.
 
 ---
 
-## 🇪🇸 Español
+## 🚀 Características
+- **Gráfico en tiempo real:** Visualiza la tendencia de tu glucosa mediante gráficos ASCII interactivos (`asciigraph`).
+- **Diseño Adaptable (Responsive):** La interfaz reacomoda automáticamente los paneles en horizontal o vertical según la altura de tu consola.
+- **Múltiples Vistas:**
+  - **Principal:** Nivel de glucosa, flecha de tendencia y gráfico.
+  - **Sensores (`i`):** Estado y días restantes del sensor activo.
+  - **Estadísticas (`s`):** Tiempo en Rango (TIR), promedios y eA1c estimada.
+  - **Debug (`d`):** Inspector del JSON crudo y códigos HTTP.
 
-### 📖 Descripción general
-Una hermosa y altamente personalizable interfaz de terminal (TUI) para monitorear tus datos de glucosa del sensor **FreeStyle Libre 2**. Obtiene datos (a través de LibreLinkUp) y muestra tus niveles actuales de glucosa, flechas de tendencia y un gráfico ASCII de las últimas horas directamente en tu terminal.
+---
 
-Construido con Golang, Bubble Tea y Lipgloss.
+## 📦 Instalación
 
-### ✨ Características
-*   **Monitoreo en tiempo real:** Se actualiza automáticamente cada 5 minutos (configurable).
-*   **Gráfico en Terminal:** Dibuja un gráfico de líneas limpio dentro de la CLI.
-*   **Colores dinámicos:** Resalta los números de glucosa en verde, amarillo o rojo dependiendo de tu rango objetivo.
-*   **Configuración TOML:** Fácil configuración y tematización (incluye el tema **Tokyo Night** por defecto).
-*   **Multiplataforma:** Funciona sin problemas en Linux y macOS.
+### Opción 1: Descargar Binario Precompilado (Recomendado)
+No necesitas tener Go instalado. Puedes descargar la versión ya compilada para tu sistema operativo desde la sección de **Releases**:
 
-### 🚀 Instalación
+👉 **[Ir a las Versiones Compiladas (Releases) ➔](https://github.com/TU_USUARIO/libre-cli/releases)**
 
-Puedes instalar la aplicación usando `make` estándar o a través del script bash proporcionado.
+1. Ve a la pestaña de [Releases](https://github.com/TU_USUARIO/libre-cli/releases) y descarga el archivo comprimido ejecutable correspondiente a tu sistema:
+   - **macOS:** `libre-cli_Darwin_x86_64.tar.gz` (Intel) o `libre-cli_Darwin_arm64.tar.gz` (Apple Silicon M1/M2/M3).
+   - **Linux:** `libre-cli_Linux_x86_64.tar.gz` o `libre-cli_Linux_arm64.tar.gz`.
+   - **Windows:** `libre-cli_Windows_x86_64.zip`.
+2. Extrae el archivo comprimido.
+3. En macOS / Linux, concede permisos de ejecución y muévelo a tu ruta global (opcional):
+   ```bash
+   chmod +x libre-cli
+   sudo mv libre-cli /usr/local/bin/
+   ```
+4. Ejecuta el comando en tu terminal:
+  ```bash
+    libre-cli
+  ```
 
-**Opción 1: Usando Make (Recomendado)**
-make install
+Opción 2: Compilar desde el Código Fuente
 
-**Opción 2: Usando el script de instalación**
-./install.sh
+Si prefieres compilar la aplicación tú mismo utilizando el compilador de Go (requiere Go 1.20+):
 
-### ⚙️ Configuración
-En su primera ejecución, la aplicación generará automáticamente un archivo de configuración ubicado en:
-~/.config/libre-cli/config.toml
+```bash
+git clone [https://github.com/TU_USUARIO/libre-cli.git](https://github.com/TU_USUARIO/libre-cli.git)
+cd libre-cli
+go build -o libre-cli ./cmd/libre-cli
+./libre-cli
 
-Puedes editar este archivo para cambiar tus credenciales de LibreLinkUp, ajustar el intervalo de actualización, definir tu rango objetivo de glucosa (min_glucose / max_glucose) y personalizar completamente los colores del tema.
 
-### 💻 Uso
-Simplemente ejecuta el comando desde cualquier terminal:
-libre-cli
+```
 
-Presiona q o Ctrl+C para salir de forma segura de la aplicación.
+## ⚙️ Configuración
+
+Para utilizar la aplicación debes tener una cuenta activa en la app LibreLinkUp configurada como seguidor del paciente.
+Al ejecutar el programa por primera vez, se generará automáticamente un archivo de configuración en `~/.config/libre-cli/config.toml` (o en `%APPDATA%\libre-cli\config.toml` en Windows).
+Abre dicho archivo y edítalo con tus credenciales:
+
+```toml
+[app]
+email = "tu_correo_seguidor@email.com"
+password = "tu_password"
+region = "cl" # Opciones: cl (Chile/LatAm), eu (Europa), us (EEUU)
+update_interval_minutes = 5
+min_glucose = 70.0
+max_glucose = 180.0
+```
+
+## ⌨️ Controles de Teclado
+
+Tecla | Acción
+--- | ---
+s | "Abre / Cierra la vista de Estadísticas (TIR, Promedio, eA1c)."
+i | Abre / Cierra la vista de Sensores activos.
+d| Abre / Cierra la vista de Debug / Inspector JSON.
+q / Ctrl+C | Sale de la aplicación.
+
+## 🤝 Contribuciones
+¡Las contribuciones son bienvenidas! Por favor, lee nuestro Código de Conducta y revisa la Guía de Contribución antes de enviar un Pull Request.
+
+## 📄 Licencia
+
+Este proyecto se distribuye bajo los términos de la Licencia MIT. Consulta el archivo LICENSE para obtener más detalles.

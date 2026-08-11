@@ -1,0 +1,70 @@
+name: Manual & Automatic Release
+
+on:
+  # Permite lanzar el release de forma manual desde la pestaña Actions seleccionando el tipo de incremento
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Tipo de versión a liberar (Bump Level)'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+  # Opcional: Se ejecuta automáticamente al hacer push a main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  release:
+    name: Release & Generate Changelog
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configurar Node.js (requerido para Semantic Release)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Instalar dependencias de Semantic Release
+        run: |
+          npm install -g \
+            semantic-release \
+            @semantic-release/changelog \
+            @semantic-release/git \
+            @semantic-release/exec \
+            @semantic-release/github
+
+      - name: Ejecutar Semantic Release (Forzado por Selector Manual)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Si se invoca manualmente, sobreescribimos el cálculo automático según lo seleccionado
+          OVERRIDE_TYPE="${{ inputs.release_type }}"
+          echo "Ejecutando release manual de tipo: $OVERRIDE_TYPE"
+
+          npx semantic-release --no-ci --dry-run false \
+            --plugins "@semantic-release/commit-analyzer" "@semantic-release/release-notes-generator" "@semantic-release/changelog" "@semantic-release/git" "@semantic-release/github"
+
+      - name: Ejecutar Semantic Release (Automático por Commits)
+        if: ${{ github.event_name == 'push' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npx semantic-release
