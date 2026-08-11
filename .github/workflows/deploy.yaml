@@ -1,0 +1,59 @@
+name: Release Binaries
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build & Release for ${{ matrix.os }}-${{ matrix.arch }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [linux, darwin, windows]
+        arch: [amd64, arm64]
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Configurar Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.20'
+          cache: true
+
+      - name: Descargar dependencias
+        run: go mod tidy
+
+      - name: Compilar binario
+        env:
+          GOOS: ${{ matrix.os }}
+          GOARCH: ${{ matrix.arch }}
+        run: |
+          BINARY_NAME=libre-cli
+          if [ "${{ matrix.os }}" = "windows" ]; then
+            BINARY_NAME=libre-cli.exe
+          fi
+
+          go build -o $BINARY_NAME ./cmd/libre-cli
+
+          ASSET_NAME=libre-cli-${{ matrix.os }}-${{ matrix.arch }}
+          if [ "${{ matrix.os }}" = "windows" ]; then
+            zip ${ASSET_NAME}.zip $BINARY_NAME
+            echo "ASSET_FILE=${ASSET_NAME}.zip" >> $GITHUB_ENV
+          else
+            tar -czvf ${ASSET_NAME}.tar.gz $BINARY_NAME
+            echo "ASSET_FILE=${ASSET_NAME}.tar.gz" >> $GITHUB_ENV
+          fi
+
+      - name: Subir a GitHub Releases
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ env.ASSET_FILE }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
