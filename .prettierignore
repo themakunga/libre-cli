@@ -1,0 +1,15 @@
+# Ignorar binarios y archivos empaquetados
+/bin/
+*.exe
+*.tar.gz
+*.zip
+
+# Ignorar archivos propios de Go (usamos go fmt para esto)
+*.go
+go.mod
+go.sum
+
+# Ignorar archivos ocultos o de git
+.git/
+.idea/
+.vscode/

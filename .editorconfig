@@ -1,0 +1,22 @@
+root = true
+
+# Reglas generales para todos los archivos
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Golang exige el uso de tabulaciones para indentar
+[*.go]
+indent_style = tab
+indent_size = 4
+
+# Los Makefiles también requieren tabulaciones estrictamente
+[Makefile]
+indent_style = tab
+
+# Archivos de configuración y texto plano (usualmente prefieren espacios)
+[*.{yml,yaml,toml,json,md,sh}]
+indent_style = space
+indent_size = 2

@@ -1,0 +1,38 @@
+# ---------------------------------------------------
+# Binarios y archivos generados
+# ---------------------------------------------------
+/bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.tar.gz
+*.zip
+
+# Archivos de test compilados
+*.test
+
+# Archivos temporales de Go
+go.work
+go.work.sum
+
+# ---------------------------------------------------
+# Archivos del Sistema Operativo
+# ---------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ---------------------------------------------------
+# Entornos de desarrollo y editores (IDEs)
+# ---------------------------------------------------
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
