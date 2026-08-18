@@ -12,6 +12,7 @@ import (
 
 	"libre-cli/internal/api"
 	"libre-cli/internal/config"
+	"libre-cli/internal/mascot"
 )
 
 type tickMsg time.Time
@@ -35,9 +36,20 @@ type Model struct {
 	lastUpdated time.Time
 	loading     bool
 	viewMode    ViewMode
-	termWidth   int // NUEVO: Ancho de la terminal
-	termHeight  int // NUEVO: Alto de la terminal
+	termWidth   int
+	termHeight  int
 	err         error
+	mascotFrame int // current animation frame for Gotita
+}
+
+// mascotAnimMsg is fired by the mascot animation ticker.
+type mascotAnimMsg time.Time
+
+// mascotTickCmd schedules the next mascot animation frame after duration d.
+func mascotTickCmd(d time.Duration) tea.Cmd {
+	return tea.Tick(d, func(t time.Time) tea.Msg {
+		return mascotAnimMsg(t)
+	})
 }
 
 func New(cfg config.Config) Model {
@@ -45,7 +57,7 @@ func New(cfg config.Config) Model {
 		config:     cfg,
 		loading:    true,
 		history:    []float64{},
-		termWidth:  80, // Valores por defecto
+		termWidth:  80,
 		termHeight: 24,
 	}
 }
@@ -54,12 +66,13 @@ func (m Model) Init() tea.Cmd {
 	return tea.Batch(
 		m.fetchGlucoseCmd(),
 		tickEvery(m.config.App.UpdateIntervalMinutes),
+		mascotTickCmd(mascot.AnimInterval(mascot.StateLoading)),
 	)
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
-	case tea.WindowSizeMsg: // NUEVO: Capturar el tamaño de la pantalla
+	case tea.WindowSizeMsg:
 		m.termWidth = msg.Width
 		m.termHeight = msg.Height
 		return m, nil
@@ -90,6 +103,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			return m, nil
 		}
+
+	case mascotAnimMsg:
+		m.mascotFrame++
+		state := mascot.GetState(m.glucose, m.config.App.MinGlucose, m.config.App.MaxGlucose, m.loading)
+		return m, mascotTickCmd(mascot.AnimInterval(state))
 
 	case tickMsg:
 		return m, tea.Batch(
@@ -123,7 +141,13 @@ func (m Model) View() string {
 	theme := m.config.Theme
 
 	if m.loading {
-		return lipgloss.NewStyle().Foreground(lipgloss.Color(theme.Accent1)).Render("Conectando con la API LibreLinkUp...\n")
+		gotita := mascot.Render(mascot.StateLoading, m.mascotFrame, lipgloss.Color(theme.Accent1))
+		loadingMsg := lipgloss.NewStyle().
+			Foreground(lipgloss.Color(theme.Accent1)).
+			MarginLeft(2).
+			Render("Conectando con la\nAPI LibreLinkUp...")
+		row := lipgloss.JoinHorizontal(lipgloss.Center, gotita, loadingMsg)
+		return lipgloss.NewStyle().Margin(1, 2).Render(row)
 	}
 
 	titleStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color(theme.Accent2)).MarginBottom(1)
@@ -240,7 +264,7 @@ func (m Model) View() string {
 	}
 
 	// ==========================================
-	// VISTA PRINCIPAL (Adaptable según altura)
+	// VISTA PRINCIPAL (Alturas fijas por modo)
 	// ==========================================
 	appCfg := m.config.App
 	glucoseColor := lipgloss.Color(theme.Good)
@@ -248,12 +272,25 @@ func (m Model) View() string {
 		glucoseColor = lipgloss.Color(theme.Critical)
 	}
 
+	// ── Gotita: mascota reactiva ───────────────────────────────────────────
+	mascotState := mascot.GetState(m.glucose, appCfg.MinGlucose, appCfg.MaxGlucose, false)
+	mascotColor := mascot.ColorFor(mascotState, theme.Good, theme.Warning, theme.Critical, theme.Accent1)
+	mascotBlock := mascot.Render(mascotState, m.mascotFrame, mascotColor)
+	availWidth := m.termWidth - 4
+	if availWidth < 7 {
+		availWidth = 7
+	}
+	mascotCentered := lipgloss.NewStyle().
+		Width(availWidth).
+		Align(lipgloss.Center).
+		Render(mascotBlock)
+
 	valueStyle := lipgloss.NewStyle().
 		Bold(true).
 		Foreground(glucoseColor).
 		BorderStyle(lipgloss.RoundedBorder()).
 		BorderForeground(lipgloss.Color(theme.Accent1)).
-		Padding(1, 3)
+		Padding(0, 2)
 
 	trendArrow := "→"
 	switch m.trend {
@@ -271,41 +308,66 @@ func (m Model) View() string {
 
 	currentBlock := valueStyle.Render(fmt.Sprintf("%d mg/dL %s", int(math.Round(m.glucose)), trendArrow))
 
-	// Calcular altura disponible para el gráfico de forma dinámica
-	graphHeight := 10
-	graphWidth := 50
-
-	// Si la pantalla es baja (menos de 28 líneas), ajustamos dimensiones
-	if m.termHeight < 28 {
-		graphHeight = 6
-	}
-
-	graphText := ""
-	if len(m.history) > 0 {
-		graph := asciigraph.Plot(m.history,
-			asciigraph.Height(graphHeight),
-			asciigraph.Width(graphWidth),
-			asciigraph.Caption("Tendencia"),
-		)
-		graphText = lipgloss.NewStyle().Foreground(lipgloss.Color(theme.Fg)).Render(graph)
-	}
-
 	var content string
+	var fixedHeight int
 
-	// 💡 LÓGICA RESPONSIVE:
-	// Si la altura de la terminal es menor a 25 líneas, colocamos el resumen A UN LADO del gráfico
-	if m.termHeight < 25 {
-		// Ajustar margen izquierdo para el gráfico en layout horizontal
-		graphBox := lipgloss.NewStyle().MarginLeft(2).Render(graphText)
-		content = lipgloss.JoinHorizontal(lipgloss.Center, currentBlock, graphBox)
+	// LÓGICA RESPONSIVE DE LAYOUT
+	if m.termWidth >= 65 {
+		// ------------------------------------------
+		// MODO HORIZONTAL (Ancho >= 65) -> Altura fija: 5
+		// ------------------------------------------
+		fixedHeight = 5
+
+		graphText := ""
+		if len(m.history) > 0 {
+			graph := asciigraph.Plot(m.history,
+				asciigraph.Height(3),
+				asciigraph.Width(35),
+				asciigraph.Caption("Tendencia"),
+			)
+			graphText = lipgloss.NewStyle().Foreground(lipgloss.Color(theme.Fg)).MarginLeft(2).Render(graph)
+		}
+
+		content = lipgloss.JoinHorizontal(
+			lipgloss.Center,
+			currentBlock,
+			graphText,
+		)
+
 	} else {
-		// Si la terminal es alta, mantenemos el diseño vertical clásico
-		content = lipgloss.JoinVertical(lipgloss.Left, currentBlock, lipgloss.NewStyle().MarginTop(1).Render(graphText))
+		// ------------------------------------------
+		// MODO VERTICAL (Ancho < 65) -> Altura fija: 8
+		// ------------------------------------------
+		fixedHeight = 8
+
+		graphText := ""
+		if len(m.history) > 0 {
+			graph := asciigraph.Plot(m.history,
+				asciigraph.Height(4),
+				asciigraph.Width(28),
+				asciigraph.Caption("Tendencia"),
+			)
+			graphText = lipgloss.NewStyle().Foreground(lipgloss.Color(theme.Fg)).MarginTop(1).Render(graph)
+		}
+
+		content = lipgloss.JoinVertical(
+			lipgloss.Center,
+			currentBlock,
+			graphText,
+		)
 	}
+
+	// Caja contenedora con altura estricta asignada
+	mainBoxStyle := lipgloss.NewStyle().
+		Height(fixedHeight).
+		Align(lipgloss.Center, lipgloss.Center)
+
+	mainContentBox := mainBoxStyle.Render(content)
 
 	ui := lipgloss.JoinVertical(lipgloss.Left,
 		titleStyle.Render("⚡ FreeStyle Libre Monitor"),
-		content,
+		mascotCentered,
+		mainContentBox,
 		footerBlock,
 	)
 
