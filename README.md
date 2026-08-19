@@ -29,37 +29,95 @@ Un monitor interactivo en tiempo real para la terminal (TUI) para visualizar dat
 
 ## 📦 Instalación
 
-### Opción 1: Descargar Binario Precompilado (Recomendado)
-No necesitas tener Go instalado. Puedes descargar la versión ya compilada para tu sistema operativo desde la sección de **Releases**:
+### Opción 1: Binario precompilado (Recomendado)
 
-👉 **[Ir a las Versiones Compiladas (Releases) ➔](https://github.com/TU_USUARIO/libre-cli/releases)**
+No necesitas tener Go instalado. Descarga el binario para tu sistema desde la página de **[Releases](https://github.com/TU_USUARIO/libre-cli/releases/latest)**.
 
-1. Ve a la pestaña de [Releases](https://github.com/TU_USUARIO/libre-cli/releases) y descarga el archivo comprimido ejecutable correspondiente a tu sistema:
-   - **macOS:** `libre-cli_Darwin_x86_64.tar.gz` (Intel) o `libre-cli_Darwin_arm64.tar.gz` (Apple Silicon M1/M2/M3).
-   - **Linux:** `libre-cli_Linux_x86_64.tar.gz` o `libre-cli_Linux_arm64.tar.gz`.
-   - **Windows:** `libre-cli_Windows_x86_64.zip`.
-2. Extrae el archivo comprimido.
-3. En macOS / Linux, concede permisos de ejecución y muévelo a tu ruta global (opcional):
-   ```bash
-   chmod +x libre-cli
-   sudo mv libre-cli /usr/local/bin/
-   ```
-4. Ejecuta el comando en tu terminal:
-  ```bash
-    libre-cli
-  ```
+El pipeline genera los siguientes archivos por cada versión:
 
-Opción 2: Compilar desde el Código Fuente
+| Plataforma | Archivo |
+|---|---|
+| macOS — Apple Silicon (M1/M2/M3) | `libre-cli-darwin-arm64.tar.gz` |
+| macOS — Intel | `libre-cli-darwin-amd64.tar.gz` |
+| Linux — x86_64 | `libre-cli-linux-amd64.tar.gz` |
+| Linux — ARM64 (Raspberry Pi, etc.) | `libre-cli-linux-arm64.tar.gz` |
+| Windows — x86_64 | `libre-cli-windows-amd64.zip` |
+| Windows — ARM64 | `libre-cli-windows-arm64.zip` |
 
-Si prefieres compilar la aplicación tú mismo utilizando el compilador de Go (requiere Go 1.20+):
+---
+
+#### 🍎 macOS
 
 ```bash
-git clone [https://github.com/TU_USUARIO/libre-cli.git](https://github.com/TU_USUARIO/libre-cli.git)
+# Apple Silicon (M1/M2/M3)
+curl -L https://github.com/TU_USUARIO/libre-cli/releases/latest/download/libre-cli-darwin-arm64.tar.gz | tar xz
+
+# Intel
+curl -L https://github.com/TU_USUARIO/libre-cli/releases/latest/download/libre-cli-darwin-amd64.tar.gz | tar xz
+
+# Dar permisos y mover al PATH
+chmod +x libre-cli
+sudo mv libre-cli /usr/local/bin/
+
+# Primera ejecución: si macOS bloquea el binario por "desarrollador no verificado"
+xattr -d com.apple.quarantine /usr/local/bin/libre-cli
+```
+
+#### 🐧 Linux
+
+```bash
+# x86_64
+curl -L https://github.com/TU_USUARIO/libre-cli/releases/latest/download/libre-cli-linux-amd64.tar.gz | tar xz
+
+# ARM64
+curl -L https://github.com/TU_USUARIO/libre-cli/releases/latest/download/libre-cli-linux-arm64.tar.gz | tar xz
+
+# Dar permisos y mover al PATH
+chmod +x libre-cli
+sudo mv libre-cli /usr/local/bin/
+```
+
+#### 🪟 Windows
+
+Descarga `libre-cli-windows-amd64.zip` desde [Releases](https://github.com/TU_USUARIO/libre-cli/releases/latest) y descomprime con el Explorador de archivos, o desde PowerShell:
+
+```powershell
+# Descomprimir
+Expand-Archive libre-cli-windows-amd64.zip -DestinationPath .
+
+# Ejecutar directamente
+.\libre-cli.exe
+
+# Opcional: mover a una carpeta incluida en el PATH (ej. C:\Tools)
+Move-Item libre-cli.exe C:\Tools\libre-cli.exe
+```
+
+> **Nota Windows:** si Windows Defender bloquea el ejecutable, ve a *Configuración → Seguridad de Windows → Protección contra virus → Historial de protección* y permite el archivo manualmente.
+
+#### ✅ Verificar integridad del binario (opcional)
+
+Cada release incluye un archivo `.sha256` junto al binario para verificar que la descarga no fue alterada:
+
+```bash
+# Linux / macOS
+sha256sum -c libre-cli-linux-amd64.tar.gz.sha256
+
+# Windows (PowerShell)
+Get-FileHash libre-cli-windows-amd64.zip -Algorithm SHA256
+# Compara el hash con el contenido del archivo .sha256 del release
+```
+
+---
+
+### Opción 2: Compilar desde el código fuente
+
+Requiere [Go 1.20+](https://go.dev/dl/):
+
+```bash
+git clone https://github.com/TU_USUARIO/libre-cli.git
 cd libre-cli
 go build -o libre-cli ./cmd/libre-cli
 ./libre-cli
-
-
 ```
 
 ## ⚙️ Configuración

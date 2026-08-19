@@ -10,9 +10,10 @@ permissions:
 
 jobs:
   build-and-release:
-    name: Build & Release for ${{ matrix.os }}-${{ matrix.arch }}
+    name: Build & Release — ${{ matrix.os }}/${{ matrix.arch }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false   # si una plataforma falla, las demás continúan
       matrix:
         os: [linux, darwin, windows]
         arch: [amd64, arm64]
@@ -24,36 +25,47 @@ jobs:
       - name: Configurar Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.20'
+          go-version-file: go.mod   # usa la versión declarada en go.mod
           cache: true
 
       - name: Descargar dependencias
-        run: go mod tidy
+        run: go mod download
 
       - name: Compilar binario
         env:
           GOOS: ${{ matrix.os }}
           GOARCH: ${{ matrix.arch }}
+          CGO_ENABLED: 0            # binario estático, sin dependencias de C
         run: |
           BINARY_NAME=libre-cli
           if [ "${{ matrix.os }}" = "windows" ]; then
             BINARY_NAME=libre-cli.exe
           fi
 
-          go build -o $BINARY_NAME ./cmd/libre-cli
+          # -s -w eliminan símbolos de debug → binario más pequeño
+          go build -ldflags="-s -w" -o "$BINARY_NAME" ./cmd/libre-cli
 
           ASSET_NAME=libre-cli-${{ matrix.os }}-${{ matrix.arch }}
           if [ "${{ matrix.os }}" = "windows" ]; then
-            zip ${ASSET_NAME}.zip $BINARY_NAME
+            zip "${ASSET_NAME}.zip" "$BINARY_NAME"
             echo "ASSET_FILE=${ASSET_NAME}.zip" >> $GITHUB_ENV
           else
-            tar -czvf ${ASSET_NAME}.tar.gz $BINARY_NAME
+            tar -czvf "${ASSET_NAME}.tar.gz" "$BINARY_NAME"
             echo "ASSET_FILE=${ASSET_NAME}.tar.gz" >> $GITHUB_ENV
           fi
 
+      - name: Generar checksum SHA256
+        run: |
+          sha256sum "${{ env.ASSET_FILE }}" > "${{ env.ASSET_FILE }}.sha256"
+          echo "CHECKSUM_FILE=${{ env.ASSET_FILE }}.sha256" >> $GITHUB_ENV
+
       - name: Subir a GitHub Releases
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
-          files: ${{ env.ASSET_FILE }}
+          fail_on_unmatched_files: true
+          make_latest: true
+          files: |
+            ${{ env.ASSET_FILE }}
+            ${{ env.CHECKSUM_FILE }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
