@@ -1,6 +1,8 @@
 # ⚡ libre-cli
 
-Un monitor interactivo en tiempo real para la terminal (TUI) para visualizar datos de glucosa de sensores **FreeStyle Libre** consumidos a través de la API no oficial de **LibreLinkUp**.
+Un monitor interactivo en tiempo real para la terminal (TUI) para visualizar
+datos de glucosa de sensores **FreeStyle Libre** consumidos a través de la API
+no oficial de **LibreLinkUp**.
 
 ![Licencia MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 ![Go Version](https://img.shields.io/badge/Go-1.20%2B-00ADD8.svg)
@@ -10,15 +12,31 @@ Un monitor interactivo en tiempo real para la terminal (TUI) para visualizar dat
 
 > ⚠️ **AVISO LEGAL Y DESCARGO DE RESPONSABILIDAD (DISCLAIMER)**
 >
-> 1. **Sin Afiliación Comercial:** Este proyecto **NO** está afiliado, asociado, autorizado, respaldado ni conectado de ninguna manera oficialmente con **Abbott Laboratories**, **FreeStyle Libre**, **LibreLinkUp**, ni con ninguna de sus filiales o subsidiarias. El nombre *FreeStyle Libre*, así como las marcas y logotipos relacionados, son marcas registradas de sus respectivos propietarios.
-> 2. **Uso Exclusivamente Personal y Educativo:** Esta herramienta ha sido desarrollada con fines exclusivamente educativos, de aprendizaje técnico y de **uso estrictamente personal**. No debe utilizarse en entornos de producción médica ni para la automatización de decisiones de salud.
-> 3. **No es un Dispositivo Médico:** **`libre-cli` NO es un dispositivo médico** ni un software de diagnóstico. No debes tomar decisiones médicas ni de dosificación (como administración de insulina) basándote en los datos visualizados en esta aplicación. Utiliza siempre las aplicaciones oficiales aprobadas por las autoridades de salud y los dispositivos de medición directa recomendados por tu médico.
+> 1. **Sin Afiliación Comercial:** Este proyecto **NO** está afiliado, asociado,
+>    autorizado, respaldado ni conectado de ninguna manera oficialmente con
+>    **Abbott Laboratories**, **FreeStyle Libre**, **LibreLinkUp**, ni con
+>    ninguna de sus filiales o subsidiarias. El nombre _FreeStyle Libre_, así
+>    como las marcas y logotipos relacionados, son marcas registradas de sus
+>    respectivos propietarios.
+> 2. **Uso Exclusivamente Personal y Educativo:** Esta herramienta ha sido
+>    desarrollada con fines exclusivamente educativos, de aprendizaje técnico y
+>    de **uso estrictamente personal**. No debe utilizarse en entornos de
+>    producción médica ni para la automatización de decisiones de salud.
+> 3. **No es un Dispositivo Médico:** **`libre-cli` NO es un dispositivo
+>    médico** ni un software de diagnóstico. No debes tomar decisiones médicas
+>    ni de dosificación (como administración de insulina) basándote en los datos
+>    visualizados en esta aplicación. Utiliza siempre las aplicaciones oficiales
+>    aprobadas por las autoridades de salud y los dispositivos de medición
+>    directa recomendados por tu médico.
 
 ---
 
 ## 🚀 Características
-- **Gráfico en tiempo real:** Visualiza la tendencia de tu glucosa mediante gráficos ASCII interactivos (`asciigraph`).
-- **Diseño Adaptable (Responsive):** La interfaz reacomoda automáticamente los paneles en horizontal o vertical según la altura de tu consola.
+
+- **Gráfico en tiempo real:** Visualiza la tendencia de tu glucosa mediante
+  gráficos ASCII interactivos (`asciigraph`).
+- **Diseño Adaptable (Responsive):** La interfaz reacomoda automáticamente los
+  paneles en horizontal o vertical según la altura de tu consola.
 - **Múltiples Vistas:**
   - **Principal:** Nivel de glucosa, flecha de tendencia y gráfico.
   - **Sensores (`i`):** Estado y días restantes del sensor activo.
@@ -31,18 +49,20 @@ Un monitor interactivo en tiempo real para la terminal (TUI) para visualizar dat
 
 ### Opción 1: Binario precompilado (Recomendado)
 
-No necesitas tener Go instalado. Descarga el binario para tu sistema desde la página de **[Releases](https://github.com/TU_USUARIO/libre-cli/releases/latest)**.
+No necesitas tener Go instalado. Descarga el binario para tu sistema desde la
+página de
+**[Releases](https://github.com/TU_USUARIO/libre-cli/releases/latest)**.
 
 El pipeline genera los siguientes archivos por cada versión:
 
-| Plataforma | Archivo |
-|---|---|
-| macOS — Apple Silicon (M1/M2/M3) | `libre-cli-darwin-arm64.tar.gz` |
-| macOS — Intel | `libre-cli-darwin-amd64.tar.gz` |
-| Linux — x86_64 | `libre-cli-linux-amd64.tar.gz` |
-| Linux — ARM64 (Raspberry Pi, etc.) | `libre-cli-linux-arm64.tar.gz` |
-| Windows — x86_64 | `libre-cli-windows-amd64.zip` |
-| Windows — ARM64 | `libre-cli-windows-arm64.zip` |
+| Plataforma                         | Archivo                         |
+| ---------------------------------- | ------------------------------- |
+| macOS — Apple Silicon (M1/M2/M3)   | `libre-cli-darwin-arm64.tar.gz` |
+| macOS — Intel                      | `libre-cli-darwin-amd64.tar.gz` |
+| Linux — x86_64                     | `libre-cli-linux-amd64.tar.gz`  |
+| Linux — ARM64 (Raspberry Pi, etc.) | `libre-cli-linux-arm64.tar.gz`  |
+| Windows — x86_64                   | `libre-cli-windows-amd64.zip`   |
+| Windows — ARM64                    | `libre-cli-windows-arm64.zip`   |
 
 ---
 
@@ -79,7 +99,9 @@ sudo mv libre-cli /usr/local/bin/
 
 #### 🪟 Windows
 
-Descarga `libre-cli-windows-amd64.zip` desde [Releases](https://github.com/TU_USUARIO/libre-cli/releases/latest) y descomprime con el Explorador de archivos, o desde PowerShell:
+Descarga `libre-cli-windows-amd64.zip` desde
+[Releases](https://github.com/TU_USUARIO/libre-cli/releases/latest) y
+descomprime con el Explorador de archivos, o desde PowerShell:
 
 ```powershell
 # Descomprimir
@@ -92,11 +114,14 @@ Expand-Archive libre-cli-windows-amd64.zip -DestinationPath .
 Move-Item libre-cli.exe C:\Tools\libre-cli.exe
 ```
 
-> **Nota Windows:** si Windows Defender bloquea el ejecutable, ve a *Configuración → Seguridad de Windows → Protección contra virus → Historial de protección* y permite el archivo manualmente.
+> **Nota Windows:** si Windows Defender bloquea el ejecutable, ve a
+> _Configuración → Seguridad de Windows → Protección contra virus → Historial de
+> protección_ y permite el archivo manualmente.
 
 #### ✅ Verificar integridad del binario (opcional)
 
-Cada release incluye un archivo `.sha256` junto al binario para verificar que la descarga no fue alterada:
+Cada release incluye un archivo `.sha256` junto al binario para verificar que la
+descarga no fue alterada:
 
 ```bash
 # Linux / macOS
@@ -122,9 +147,11 @@ go build -o libre-cli ./cmd/libre-cli
 
 ## ⚙️ Configuración
 
-Para utilizar la aplicación debes tener una cuenta activa en la app LibreLinkUp configurada como seguidor del paciente.
-Al ejecutar el programa por primera vez, se generará automáticamente un archivo de configuración en `~/.config/libre-cli/config.toml` (o en `%APPDATA%\libre-cli\config.toml` en Windows).
-Abre dicho archivo y edítalo con tus credenciales:
+Para utilizar la aplicación debes tener una cuenta activa en la app LibreLinkUp
+configurada como seguidor del paciente. Al ejecutar el programa por primera vez,
+se generará automáticamente un archivo de configuración en
+`~/.config/libre-cli/config.toml` (o en `%APPDATA%\libre-cli\config.toml` en
+Windows). Abre dicho archivo y edítalo con tus credenciales:
 
 ```toml
 [app]
@@ -138,16 +165,31 @@ max_glucose = 180.0
 
 ## ⌨️ Controles de Teclado
 
-Tecla | Acción
---- | ---
-s | "Abre / Cierra la vista de Estadísticas (TIR, Promedio, eA1c)."
-i | Abre / Cierra la vista de Sensores activos.
-d| Abre / Cierra la vista de Debug / Inspector JSON.
-q / Ctrl+C | Sale de la aplicación.
+| Tecla      | Acción                                                          |
+| ---------- | --------------------------------------------------------------- |
+| s          | "Abre / Cierra la vista de Estadísticas (TIR, Promedio, eA1c)." |
+| i          | Abre / Cierra la vista de Sensores activos.                     |
+| d          | Abre / Cierra la vista de Debug / Inspector JSON.               |
+| q / Ctrl+C | Sale de la aplicación.                                          |
 
 ## 🤝 Contribuciones
-¡Las contribuciones son bienvenidas! Por favor, lee nuestro Código de Conducta y revisa la Guía de Contribución antes de enviar un Pull Request.
+
+¡Las contribuciones son bienvenidas! Por favor, lee nuestro Código de Conducta y
+revisa la Guía de Contribución antes de enviar un Pull Request.
 
 ## 📄 Licencia
 
-Este proyecto se distribuye bajo los términos de la Licencia MIT. Consulta el archivo LICENSE para obtener más detalles.
+Este proyecto se distribuye bajo los términos de la Licencia MIT. Consulta el
+archivo LICENSE para obtener más detalles.
+
+## Repository reference
+
+| Path                                 | Purpose                                 |
+| ------------------------------------ | --------------------------------------- |
+| [`cmd/`](cmd/)                       | Command entry points                    |
+| [`internal/`](internal/)             | Internal Go packages                    |
+| [`Makefile`](Makefile)               | Documented build and validation targets |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Contribution guidelines                 |
+
+The default branch is `main`. Use the tracked manifests and scripts above when
+preparing changes; keep local credentials and generated files out of commits.
